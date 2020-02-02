@@ -38,9 +38,7 @@ public class TextRank {
         return getTextRank(neighboursScores, wordsWeights);
     }
 
-    // Raw score is sigma wtsimilarity of neighbors..
-    // Used in the denominator of the Text rank formula..
-    public List<Score> getNeighboursSumWeightSimilarity(Map<String, List<Integer>> wordIdsMap, Map<String, Double> wordsWeights) {
+    private List<Score> getNeighboursSumWeightSimilarity(Map<String, List<Integer>> wordIdsMap, Map<String, Double> wordsWeights) {
         List<Score> neighboursScores = new ArrayList<>();
         Stemmer stemmer = documentProcessor.getStemmer();
 
@@ -82,7 +80,6 @@ public class TextRank {
         double wordsInCommon = 0;
         Map<String, Boolean> duplicates = new HashMap<>();
 
-        Double weight;
         for (String first : firstWords) {
             first = first.trim();
             if (!duplicates.containsKey(first)) {
@@ -119,21 +116,22 @@ public class TextRank {
             double totalErrors = 0;
             List<Score> newWeightScores = new ArrayList<>();
 
-            List<Integer> neighbours;
+            List<Integer> neighbourSentences;
             for (Score score : neighboursScores) {
                 int sentenceId = score.getSentenceId();
-                neighbours = getLinks().get(sentenceId);
+                neighbourSentences = getLinks().get(sentenceId);
+
                 double sum = 0;
-                if (neighbours != null) {
-                    for (int neighbour : neighbours) {
-                        double weightFromJToI = calculateSimilarity(sentences.get(sentenceId), sentences.get(neighbour), wordWeights);
-                        double sumWeightsFromJtoK = getScoreFromList(neighboursScores, neighbour);
-                        double weightSimilarityToJ = getScoreFromList(vertexScores, neighbour);
+                if (neighbourSentences != null) {
+                    for (int neighbourSentenceId : neighbourSentences) {
+                        double weightFromJToI = calculateSimilarity(sentences.get(sentenceId), sentences.get(neighbourSentenceId), wordWeights);
+                        double sumWeightsFromJtoK = getScoreFromList(neighboursScores, neighbourSentenceId);
+                        double weightSimilarityToJ = getScoreFromList(vertexScores, neighbourSentenceId);
                         sum += (weightFromJToI / sumWeightsFromJtoK) * weightSimilarityToJ;
                     }
                 }
                 double d = 0.85;
-                Score weightSimilarityToI = new Score(sentenceId, (1 - d) + sum * d);
+                Score weightSimilarityToI = new Score(sentenceId, (1 - d) + d * sum);
                 totalErrors += (weightSimilarityToI.getScore() - getScoreFromList(neighboursScores, sentenceId));
                 newWeightScores.add(weightSimilarityToI);
             }
