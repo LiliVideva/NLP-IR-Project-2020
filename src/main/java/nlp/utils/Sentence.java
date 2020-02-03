@@ -12,7 +12,7 @@ public class Sentence {
     private StopWords stopWords;
     private int sentenceId;
     private String sentenceValue;
-    private Score pageRankScore;
+    private Score rankScore;
     private int wordCount;
     private List<Sentence> links;
 
@@ -39,7 +39,7 @@ public class Sentence {
         for (int wordEnd = wordIterator.next(); wordEnd != BreakIterator.DONE; wordStart = wordEnd, wordEnd = wordIterator.next()) {
             word = sentenceValue.substring(wordStart, wordEnd).replaceAll("[\"']", "");
 
-            if (stopWords.isStopWord(word)) {
+            if (!stopWords.isStopWord(word)) {
                 stemmer.stem(word);
                 stringBuilder.append(stemmer.toString()).append(" ");
             }
@@ -51,7 +51,7 @@ public class Sentence {
         int wordCount = 0;
         String[] words = sentenceValue.split(" ");
         for (String word : words) {
-            if (stopWords.isStopWord(word) && !word.startsWith("'") && !word.equals(".") && !word.equals("?")) {
+            if (!stopWords.isStopWord(word) && !word.startsWith("'") && !word.equals(".") && !word.equals("?")) {
                 wordCount++;
             }
         }
@@ -78,7 +78,7 @@ public class Sentence {
         return wordCount == 0 ? sentenceValue.split(" ").length : wordCount;
     }
 
-    public void setPageRankScore(Score pageRankScore) {
-        this.pageRankScore = pageRankScore;
+    public void setRankScore(Score rankScore) {
+        this.rankScore = rankScore;
     }
 }

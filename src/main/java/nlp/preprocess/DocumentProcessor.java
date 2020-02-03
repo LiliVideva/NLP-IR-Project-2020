@@ -5,7 +5,6 @@ import nlp.utils.Sentence;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,11 +39,7 @@ public class DocumentProcessor {
 
     public List<Sentence> retrieveSentencesFromArticle(String article) {
         List<Sentence> sentencesList = new ArrayList<>();
-        List<String> sentences = new ArrayList<>();
-
-        String[] detectedSentences = article.split("\\. ");
-
-        Collections.addAll(sentences, detectedSentences);
+        String[] sentences = article.split("\\. ");
 
         int sentenceNumber = 0;
         for (String sentenceValue : sentences) {

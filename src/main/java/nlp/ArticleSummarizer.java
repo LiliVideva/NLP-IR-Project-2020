@@ -53,15 +53,15 @@ public class ArticleSummarizer {
         int currentWordCount = 0;
         maxWords = Math.max(maxWords, 0);
         while (!sentencesCopy.isEmpty()) {
-            int sentenceId = getBestSentence(sentencesCopy, sentencesScores);
+            int sentenceId = getBestSentenceId(sentencesCopy, sentencesScores);
             if (sentenceId == -1) {
                 break;
             }
 
-            Sentence sentence = sentences.get(sentenceId);
-            finalScores.add(sentencesScores.get(sentence.getSentenceId()));
-            currentWordCount += sentence.getWordCount();
-            sentencesCopy.remove(sentence);
+            Sentence bestSentence = sentences.get(sentenceId);
+            finalScores.add(sentencesScores.get(bestSentence.getSentenceId()));
+            currentWordCount += bestSentence.getWordCount();
+            sentencesCopy.remove(bestSentence);
 
             if (currentWordCount > maxWords) {
                 break;
@@ -71,12 +71,12 @@ public class ArticleSummarizer {
         return finalScores;
     }
 
-    private int getBestSentence(List<Sentence> sentences, Map<Integer, Score> pageRankScores) {
+    private int getBestSentenceId(List<Sentence> sentences, Map<Integer, Score> sentencesScores) {
         int bestSentenceId = -1;
         double bestScore = 0;
 
         for (Sentence sentence : sentences) {
-            Score score = pageRankScores.get(sentence.getSentenceId());
+            Score score = sentencesScores.get(sentence.getSentenceId());
 
             if (score != null && score.getScore() > bestScore) {
                 bestSentenceId = score.getSentenceId();
@@ -89,16 +89,16 @@ public class ArticleSummarizer {
 
     public static void main(String[] args) {
         Path filesDirectoryPath = Paths.get(String.format(".%sarticles", fileSeparator));
-        ArticleSummarizer articleSummarizer = new ArticleSummarizer();
-
         File filesDirectory = new File(filesDirectoryPath.toString());
         File[] files = filesDirectory.listFiles();
+        ArticleSummarizer articleSummarizer = new ArticleSummarizer();
+
         if (files != null) {
             for (File file : files) {
                 String fileName = file.getName();
                 Path filePath = Paths.get(String.format("%s%s%s", filesDirectoryPath, fileSeparator, fileName));
-                System.out.println();
                 Path summaryArticlePath = Paths.get(String.format(".%s%s%s%s", fileSeparator, filesDirectoryPath, fileSeparator, fileName.replace(".txt", "_Summary.txt")));
+
                 try {
                     File summaryArticleFile = new File(summaryArticlePath.toString());
                     if (!summaryArticleFile.exists()) {

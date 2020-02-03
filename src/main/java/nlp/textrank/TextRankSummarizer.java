@@ -47,7 +47,7 @@ public class TextRankSummarizer {
 
         for (Score score : finalScores) {
             sentence = sentences.get(score.getSentenceId());
-            sentence.setPageRankScore(score);
+            sentence.setRankScore(score);
         }
 
         return finalScores;

@@ -202,6 +202,6 @@ public class StopWords {
     }
 
     public boolean isStopWord(String word) {
-        return (word.length() != 1) && (stopWordsList.get(word) == null);
+        return (word.length() == 1 || stopWordsList.containsKey(word));
     }
 }

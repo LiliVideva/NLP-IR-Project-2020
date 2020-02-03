@@ -86,7 +86,7 @@ public class TextRank {
                 duplicates.put(first, true);
 
                 for (String second : secondWords) {
-                    if (stopWords.isStopWord(first) && !first.isEmpty() && first.equals(second.trim())) {
+                    if (!stopWords.isStopWord(first) && !first.isEmpty() && first.equals(second.trim())) {
                         wordsInCommon += (wordsWeights.containsKey(first) ? wordsWeights.get(first) : 1);
                     }
                 }
@@ -108,13 +108,13 @@ public class TextRank {
         List<Score> vertexScores = new ArrayList<>();
 
         for (int i = 0; i < neighboursScores.size(); i++) {
-            Score textRankI = new Score(neighboursScores.get(i).getSentenceId(), (1.00 / neighboursScores.size()));
-            vertexScores.add(textRankI);
+            Score initialScore = new Score(neighboursScores.get(i).getSentenceId(), (1.00 / neighboursScores.size()));
+            vertexScores.add(initialScore);
         }
 
         for (int i = 0; i < 100; i++) {
             double totalErrors = 0;
-            List<Score> newWeightScores = new ArrayList<>();
+            List<Score> weightVertexScores = new ArrayList<>();
 
             List<Integer> neighbourSentences;
             for (Score score : neighboursScores) {
@@ -125,17 +125,17 @@ public class TextRank {
                 if (neighbourSentences != null) {
                     for (int neighbourSentenceId : neighbourSentences) {
                         double weightFromJToI = calculateSimilarity(sentences.get(sentenceId), sentences.get(neighbourSentenceId), wordWeights);
-                        double sumWeightsFromJtoK = getScoreFromList(neighboursScores, neighbourSentenceId);
-                        double weightSimilarityToJ = getScoreFromList(vertexScores, neighbourSentenceId);
+                        double sumWeightsFromJtoK = getSentenceScore(neighboursScores, neighbourSentenceId);
+                        double weightSimilarityToJ = getSentenceScore(vertexScores, neighbourSentenceId);
                         sum += (weightFromJToI / sumWeightsFromJtoK) * weightSimilarityToJ;
                     }
                 }
                 double d = 0.85;
                 Score weightSimilarityToI = new Score(sentenceId, (1 - d) + d * sum);
-                totalErrors += (weightSimilarityToI.getScore() - getScoreFromList(neighboursScores, sentenceId));
-                newWeightScores.add(weightSimilarityToI);
+                totalErrors += (weightSimilarityToI.getScore() - getSentenceScore(neighboursScores, sentenceId));
+                weightVertexScores.add(weightSimilarityToI);
             }
-            vertexScores = newWeightScores;
+            vertexScores = weightVertexScores;
 
             double maxError = 0.1;
             if (i > 2 && (totalErrors / neighboursScores.size()) < maxError) {
@@ -144,7 +144,7 @@ public class TextRank {
         }
 
         for (Score vScore : vertexScores) {
-            vScore.setScore(vScore.getScore() * getScoreFromList(neighboursScores, vScore.getSentenceId()));
+            vScore.setScore(vScore.getScore() * getSentenceScore(neighboursScores, vScore.getSentenceId()));
         }
 
         vertexScores.sort(Score::compareTo);
@@ -152,7 +152,7 @@ public class TextRank {
         return vertexScores;
     }
 
-    private double getScoreFromList(List<Score> scores, int id) {
+    private double getSentenceScore(List<Score> scores, int id) {
         return scores.stream().filter(score -> score.getSentenceId() == id).map(Score::getScore).findFirst().orElse(1.00);
     }
 
