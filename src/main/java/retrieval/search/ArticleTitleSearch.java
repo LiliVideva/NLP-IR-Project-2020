@@ -1,7 +1,6 @@
 package retrieval.search;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class ArticleTitleSearch {
@@ -21,7 +20,7 @@ public class ArticleTitleSearch {
         files = directory.listFiles();
     }
 
-    public Map<String, Integer> calculateScore() throws IOException {
+    public Map<String, Integer> calculateScore() {
         String fileName;
         String[] titleWords;
         int count;

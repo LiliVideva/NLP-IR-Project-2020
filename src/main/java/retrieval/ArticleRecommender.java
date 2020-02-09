@@ -28,10 +28,10 @@ public class ArticleRecommender {
                 }
 
                 searchQuery = searchQuery.toLowerCase().replaceAll("[,;:!.?\"]", "");
-                retrievalSearch.retrieveArticle(articlesDirectory, searchQuery);
+                retrievalSearch.retrieveRelevantArticles(articlesDirectory, searchQuery, 5);
             }
         } catch (IOException e) {
-            System.err.println(String.format("Unable to perform the retrieval.search: %s", e.getMessage()));
+            System.err.println(String.format("Unable to perform the retrieval search: %s", e.getMessage()));
         }
     }
 }

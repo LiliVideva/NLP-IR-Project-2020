@@ -2,13 +2,13 @@ package retrieval.search;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class RetrievalSearch {
-    public void retrieveArticle(File directory, String searchQuery) throws IOException {
+    public void retrieveRelevantArticles(File directory, String searchQuery, int topResultsCount) throws IOException {
         ArticleTitleSearch articleTitleSearch = new ArticleTitleSearch(searchQuery, directory);
         Map<String, Integer> fileNameScores = articleTitleSearch.calculateScore();
 
@@ -25,19 +25,18 @@ public class RetrievalSearch {
             finalScores.put(fileName, score);
         }
 
-        int topResultsCount = 5;
         String resultsMessage = getTopResults(topResultsCount, finalScores);
         System.out.println(resultsMessage);
     }
 
     private String getTopResults(int topResultsCount, Map<String, Double> finalScores) {
         StringBuilder sb = new StringBuilder("Best suggestions, sorted in order of their relevance:\n");
-        List<String> usedFiles = new LinkedList<>();
+        List<String> usedFiles = new ArrayList<>();
 
         for (int i = 0; i < topResultsCount; i++) {
             double scorePerFile;
             double maxScore = -1.0;
-            String maxFilename = "Error!";
+            String maxFilename = null;
 
             for (String fileName : finalScores.keySet()) {
                 scorePerFile = finalScores.get(fileName);
@@ -48,7 +47,7 @@ public class RetrievalSearch {
                 }
             }
 
-            if (maxFilename.equals("Error!")) {
+            if (maxFilename == null) {
                 return sb.toString();
             }
 
