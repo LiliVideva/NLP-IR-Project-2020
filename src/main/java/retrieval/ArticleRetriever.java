@@ -38,7 +38,9 @@ public class ArticleRetriever {
     }
 
     void retrieveArticles() throws InterruptedException, IOException {
-        Files.createDirectory(articlesDirectoryPath);
+        if (Files.notExists(articlesDirectoryPath)) {
+            Files.createDirectory(articlesDirectoryPath);
+        }
 
         for (String president : americanPresidents) {
             String presidentName = president.replace(" ", "_");
@@ -59,7 +61,11 @@ public class ArticleRetriever {
                 String text = page.getString("extract").toLowerCase();
 
                 Path articlePath = Paths.get(String.format("%s%s%s.txt", articlesDirectoryPath, fileSeparator, presidentName));
-                Files.createFile(articlePath);
+
+                if (Files.notExists(articlePath)) {
+                    Files.createFile(articlePath);
+                }
+
                 try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(articlePath.toString())))) {
                     bufferedWriter.write(text);
                 }

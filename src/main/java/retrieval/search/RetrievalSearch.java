@@ -9,19 +9,19 @@ import java.util.Map;
 
 public class RetrievalSearch {
     public void retrieveRelevantArticles(File directory, String searchQuery, int topResultsCount) throws IOException {
-        ArticleTitleSearch articleTitleSearch = new ArticleTitleSearch(searchQuery, directory);
-        Map<String, Integer> fileNameScores = articleTitleSearch.calculateScore();
+        TitleSearch titleSearch = new TitleSearch(searchQuery, directory);
+        Map<String, Integer> titleScores = titleSearch.calculateScore();
 
         BM25Search bm25Search = new BM25Search(searchQuery, directory);
         Map<String, Double> bm25Scores = bm25Search.calculateScore();
 
-        SkipBigramSearch skipBigramSearch = new SkipBigramSearch(searchQuery, directory);
-        Map<String, Double> bigramScores = skipBigramSearch.calculateScore();
+        BiwordSearch biwordSearch = new BiwordSearch(searchQuery, directory);
+        Map<String, Double> biwordScores = biwordSearch.calculateScore();
 
         double score;
         Map<String, Double> finalScores = new HashMap<>();
-        for (String fileName : fileNameScores.keySet()) {
-            score = fileNameScores.get(fileName) * 3 + bm25Scores.get(fileName) + 1.5 * bigramScores.get(fileName);
+        for (String fileName : titleScores.keySet()) {
+            score = titleScores.get(fileName) * 3 + bm25Scores.get(fileName) + 1.5 * biwordScores.get(fileName);
             finalScores.put(fileName, score);
         }
 

@@ -3,17 +3,17 @@ package retrieval.search;
 import java.io.File;
 import java.util.*;
 
-public class ArticleTitleSearch {
+public class TitleSearch {
     private List<String> queryWords;
     private Map<String, Integer> scores;
     private File[] files;
 
-    private ArticleTitleSearch() {
+    private TitleSearch() {
         queryWords = new ArrayList<>();
         scores = new HashMap<>();
     }
 
-    public ArticleTitleSearch(String searchQuery, File directory) {
+    public TitleSearch(String searchQuery, File directory) {
         this();
 
         queryWords = Arrays.asList(searchQuery.split(" "));

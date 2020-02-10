@@ -6,33 +6,33 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class SkipBigramSearch {
+public class BiwordSearch {
     private List<String> queryWords;
-    private List<Bigram> searchBigrams;
+    private List<Biword> searchBiwords;
     private File[] files;
     private Map<String, Double> scores;
 
-    private static class Bigram {
+    private static class Biword {
         private String firstWord;
         private String secondWord;
 
-        public Bigram(String firstWord, String secondWord) {
+        public Biword(String firstWord, String secondWord) {
             this.firstWord = firstWord;
             this.secondWord = secondWord;
         }
     }
 
-    private SkipBigramSearch() {
+    private BiwordSearch() {
         queryWords = new ArrayList<>();
-        searchBigrams = new LinkedList<>();
+        searchBiwords = new LinkedList<>();
         scores = new HashMap<>();
     }
 
-    public SkipBigramSearch(String searchQuery, File directory) {
+    public BiwordSearch(String searchQuery, File directory) {
         this();
 
         queryWords = Arrays.asList(searchQuery.split(" "));
-        searchBigrams = initSearchBigrams();
+        searchBiwords = initSearchBiwords();
 
         files = directory.listFiles();
         if (files != null) {
@@ -42,14 +42,14 @@ public class SkipBigramSearch {
         }
     }
 
-    private List<Bigram> initSearchBigrams() {
-        List<Bigram> searchBigrams = new LinkedList<>();
+    private List<Biword> initSearchBiwords() {
+        List<Biword> searchBiwords = new LinkedList<>();
 
         for (int i = 0; i < queryWords.size() - 1; i++) {
-            searchBigrams.add(new Bigram(queryWords.get(i), queryWords.get(i + 1)));
+            searchBiwords.add(new Biword(queryWords.get(i), queryWords.get(i + 1)));
         }
 
-        return searchBigrams;
+        return searchBiwords;
     }
 
     public Map<String, Double> calculateScore() throws IOException {
@@ -73,7 +73,7 @@ public class SkipBigramSearch {
                             continue;
                         }
 
-                        if (checkBigram(words[i], words[i + 1]) || checkBigram(words[i], words[i + 2])) {
+                        if (checkBiword(words[i], words[i + 1]) || checkBiword(words[i], words[i + 2])) {
                             scores.put(file.getName(), scores.get(file.getName()) + 1);
                         }
                     }
@@ -97,9 +97,9 @@ public class SkipBigramSearch {
         return combinedLine;
     }
 
-    private boolean checkBigram(String firstWord, String secondWord) {
-        for (Bigram bigram : searchBigrams) {
-            if (bigram.firstWord.equals(firstWord) && bigram.secondWord.equals(secondWord)) {
+    private boolean checkBiword(String firstWord, String secondWord) {
+        for (Biword biword : searchBiwords) {
+            if (biword.firstWord.equals(firstWord) && biword.secondWord.equals(secondWord)) {
                 return true;
             }
         }
